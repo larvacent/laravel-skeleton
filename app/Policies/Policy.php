@@ -19,14 +19,10 @@ class Policy
 {
     use HandlesAuthorization;
 
-    public function __construct()
-    {
-        //
-    }
-
-
 //    public function before($user, $ability)
 //    {
-//
+//        if ($user->isAdmin()) {
+//            return true;
+//        }
 //    }
 }
