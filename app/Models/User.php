@@ -14,6 +14,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * 用户模型
@@ -31,7 +32,7 @@ use Illuminate\Support\Facades\Cache;
  *
  * @author Tongle Xu <xutongle@gmail.com>
  */
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use Notifiable, SoftDeletes;
 
@@ -86,12 +87,102 @@ class User extends Authenticatable
     ];
 
     /**
+     * 获取手机号
+     * @param \Illuminate\Notifications\Notification|null $notification
+     * @return int|null
+     */
+    public function routeNotificationForMobile($notification)
+    {
+        return $this->mobile;
+    }
+
+    /**
      * 用户是否在线
      * @return bool
      */
     public function isOnline()
     {
         return Cache::has('user-online-' . $this->id);
+    }
+
+    /**
+     * 发送邮箱验证通知
+     *
+     * @return void
+     */
+    public function sendEmailVerificationNotification()
+    {
+        if (!is_null($this->email)) {
+            $this->notify(new \Illuminate\Auth\Notifications\VerifyEmail);
+        }
+    }
+
+    /**
+     * Determine if the user has verified their mobile number.
+     *
+     * @return bool
+     */
+    public function hasVerifiedMobile()
+    {
+        return !is_null($this->mobile_verified_at);
+    }
+
+    /**
+     * Mark the given user's mobile as verified.
+     *
+     * @return bool
+     */
+    public function markMobileAsVerified()
+    {
+        $status = $this->forceFill([
+            'mobile_verified_at' => $this->freshTimestamp(),
+        ])->save();
+        event(new \App\Events\User\MobileVerified($this));
+        return $status;
+    }
+
+    /**
+     * 重置用户密码
+     *
+     * @param string $password
+     * @return void
+     */
+    public function resetPassword($password)
+    {
+        $this->password = Hash::make($password);
+        $this->setRememberToken(\Illuminate\Support\Str::random(60));
+        $this->save();
+        event(new \Illuminate\Auth\Events\PasswordReset($this));
+    }
+
+    /**
+     * 重置用户手机号
+     * @param int $mobile
+     * @return bool
+     */
+    public function resetMobile($mobile)
+    {
+        $status = $this->forceFill([
+            'mobile' => $mobile,
+            'mobile_verified_at' => $this->freshTimestamp(),
+        ])->save();
+        event(new \App\Events\User\MobileReset($this));
+        return $status;
+    }
+
+    /**
+     * 重置用户邮箱
+     * @param string $email
+     * @return bool
+     */
+    public function resetEmail($email)
+    {
+        $status = $this->forceFill([
+            'email' => $email,
+            'email_verified_at' => $this->freshTimestamp(),
+        ])->save();
+        event(new \App\Events\User\MailReset($this));
+        return $status;
     }
 
     /**
