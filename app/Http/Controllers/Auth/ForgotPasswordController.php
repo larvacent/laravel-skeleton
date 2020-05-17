@@ -30,4 +30,17 @@ class ForgotPasswordController extends Controller
     */
 
     use SendsPasswordResetEmails;
+
+    /**
+     * 显示邮件找回密码链接
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\View\View
+     */
+    public function showLinkRequestForm()
+    {
+        if (!settings('user.enable_password_recovery')) {
+            return redirect(url()->previous())->with('status', trans('user.closed_password_forgot'));
+        }
+        return view('auth.passwords.email');
+    }
 }

@@ -64,6 +64,8 @@ class RegisterController extends Controller
     {
         if ($request->user()) {
             return redirect(url()->previous());
+        } else if (!settings('user.enable_registration')) {
+            return redirect(url()->previous())->with('status', trans('user.registration_closed'));
         }
         $request->session()->put('actions-redirect', URL::previous());
         return view('auth.register');
@@ -109,6 +111,9 @@ class RegisterController extends Controller
      */
     protected function registered(Request $request, $user)
     {
-
+        if (settings('user.enable_welcome_email') && !empty($user->email)) {
+            $user->notify(new \App\Notifications\WelcomeNotification($user->username));
+        }
+        return;
     }
 }
