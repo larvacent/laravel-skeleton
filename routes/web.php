@@ -16,3 +16,7 @@ use Illuminate\Contracts\Routing\Registrar as RouteContract;
 */
 
 Route::get('/', 'MainController@index');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
