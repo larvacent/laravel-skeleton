@@ -9,4 +9,5 @@
 return [
     'registration_closed' => 'The system has closed the new user registration.',
     'closed_password_forgot' => ' The system has closed the password forgot.',
+    'default_bio' => 'This guy is lazy and hasn\'t written anything!'
 ];

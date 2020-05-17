@@ -38,5 +38,14 @@ class AppServiceProvider extends ServiceProvider
         Resource::withoutWrapping();
         Carbon::setLocale('zh');
 
+        $this->registerObserve();
+    }
+
+    /**
+     * Register observes.
+     */
+    protected function registerObserve()
+    {
+        \App\Models\User::observe(\App\Observers\UserObserver::class);//用户
     }
 }

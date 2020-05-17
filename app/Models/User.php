@@ -30,6 +30,9 @@ use Illuminate\Support\Facades\Hash;
  * @property Carbon $updated_at 更新时间
  * @property Carbon|null $deleted_at 删除时间
  *
+ * @property UserProfile $profile 个人信息
+ * @property UserExtra $extra 扩展信息
+ *
  * @author Tongle Xu <xutongle@gmail.com>
  */
 class User extends Authenticatable implements MustVerifyEmail
@@ -85,6 +88,24 @@ class User extends Authenticatable implements MustVerifyEmail
         'created_at',
         'updated_at',
     ];
+
+    /**
+     * 获取用户资料
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function profile()
+    {
+        return $this->hasOne(UserProfile::class);
+    }
+
+    /**
+     * 获取用户扩展资料
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function extra()
+    {
+        return $this->hasOne(UserExtra::class);
+    }
 
     /**
      * 获取手机号
@@ -183,6 +204,21 @@ class User extends Authenticatable implements MustVerifyEmail
         ])->save();
         event(new \App\Events\User\MailReset($this));
         return $status;
+    }
+
+    /**
+     * 通过ID获取用户，带缓存
+     * @param int $id
+     * @return User|null
+     */
+    public static function findById($id)
+    {
+        if (!$id || $id <= 0 || !is_numeric($id)) {
+            return null;
+        }
+        return Cache::remember('users:' . $id, Carbon::now()->addMinutes(30), function () use ($id) {
+            return static::find($id);
+        });
     }
 
     /**

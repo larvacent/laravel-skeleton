@@ -9,4 +9,5 @@
 return [
     'registration_closed' => '系统关闭了用户注册。',
     'closed_password_forgot' => '系统关闭了密码找回。',
+    'default_bio' => '这家伙很懒，什么也没写！'
 ];
