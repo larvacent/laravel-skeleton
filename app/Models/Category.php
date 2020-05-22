@@ -12,15 +12,18 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * 栏目模型
- * @property int $id ID
- * @property int $parent_id 父ID
- * @property string $title 名称
- * @property int $order 排序
- * @property string $style 样式
- * @property string $image 图片
- * @property string description 描述
+ * @property int $id 栏目ID
+ * @property int $parent_id 父栏目ID
+ * @property string $title 栏目名称
+ * @property int $order 栏目排序
+ * @property string $style 栏目样式
+ * @property string $image 栏目图片
+ * @property string description 栏目描述
  * @property \Illuminate\Support\Carbon $created_at 创建时间
  * @property \Illuminate\Support\Carbon $updated_at 更新时间
+ *
+ * @property Category $parent 父栏目
+ * @property Category[] $children 子栏目
  *
  * @author Tongle Xu <xutongle@gmail.com>
  */
